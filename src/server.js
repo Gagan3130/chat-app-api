@@ -4,6 +4,8 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const { createServer } = require('node:http');
+const { Server } = require('socket.io');
 const cors = require("cors");
 const {
   ValidationError,
@@ -14,10 +16,12 @@ dotenv.config();
 connectDB();
 const PORT = process.env.PORT || 5000;
 let corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost:3001", "https://chat-app-5lod.onrender.com"],
+  origin: ["http://localhost:3000", "https://chat-app-5lod.onrender.com"],
 };
 
 const app = express();
+const server = createServer(app);
+
 app.use(cors(corsOptions));
 app.use(express.json()); // to accept json data from frontend
 app.use("/api/user", userRoutes);
@@ -38,15 +42,12 @@ app.use((err, req, res, next) => {
     });
   }
 });
-app.listen(PORT, console.log(`server started on port ${PORT}`));
 
 var onlineUsers = [];
-
-const { Server } = require("socket.io");
-const io = new Server({
+const io = new Server(server,{
   pingTimeout: 60000,
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001", "https://chat-app-5lod.onrender.com"],
+    origin: ["http://localhost:3000", "https://chat-app-5lod.onrender.com",],
   },
 });
 
@@ -82,4 +83,6 @@ io.on("connection", (socket) => {
   })
 });
 
-io.listen(8080);
+server.listen(PORT || 8080, () => {
+  console.log(`Listening on port ${process.env.PORT || 8080}!`);
+});
