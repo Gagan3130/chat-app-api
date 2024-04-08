@@ -14,7 +14,7 @@ dotenv.config();
 connectDB();
 const PORT = process.env.PORT || 5000;
 let corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost:3001"],
+  origin: ["http://localhost:3000", "http://localhost:3001", "https://chat-app-5lod.onrender.com"],
 };
 
 const app = express();
@@ -82,4 +82,4 @@ io.on("connection", (socket) => {
   })
 });
 
-io.listen(8080);
+io.listen(PORT);
